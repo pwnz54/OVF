@@ -1,6 +1,6 @@
 #include<iostream>
 #include<cmath>
-#define PI 3.14159
+#define PI 3.141592653589793238462643
 #define I 1.29587
 using namespace std;
 double f(double x)
@@ -41,13 +41,15 @@ double trap(double a, double b, double(*f)(double), int n)
 	return s;
 }
 int main()
-{	
-	
-	for (int n = 4; n <= 4096; n = n*2)
+{
+
+	for (int n = 4; n <= 4096; n = n * 2)
 	{
-		cout << n << endl;
-		cout << abs(trap(-1, 1, f, n) - PI / 2) << endl;
+		//cout << n << endl;
+		cout << abs((PI / 2 - simp(-1, 1, f, n))/(PI/2 - simp(-1,1,f,n*2))) << endl;
+		//cout << 1. / (n*n)<<endl;
 	}
+
 	/*cout << "dx/(1+x^2) from -1 to 1 \n Simpson: \n";
 	cout << simp(-1, 1, f, 4) << endl;
 	cout << simp(-1, 1, f, 8) << endl;
