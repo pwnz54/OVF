@@ -1,12 +1,13 @@
 #include<iostream>
 #include<cmath>
+#include <fstream>
 #define PI 3.141592653589793238462643
 using namespace std;
 double lagrange(double _x, double* x, double* y, int n)
 {
 	double res = 0;
-	
-	
+
+
 	for (int i(0); i < n; i++)
 	{
 		double a = 1;
@@ -16,7 +17,7 @@ double lagrange(double _x, double* x, double* y, int n)
 			if (i != j)
 			{
 				a *= _x - x[j];
-				b *= x[j] - x[i];
+				b *= -x[j] + x[i];
 			}
 		}
 
@@ -38,10 +39,10 @@ double rr(double* x, double* y, int n)
 			}
 		}
 		res += (y[i] / p);
-	
+
 	}
 	return res;
-	
+
 }
 double newton(double _x, double* x, double* y, int n)
 {
@@ -59,20 +60,23 @@ double newton(double _x, double* x, double* y, int n)
 }
 int main()
 {
-	int n;
-	cin >> n ;
-	double *x = new double[n];
-	double *y = new double[n];
-	for (int k = 0; k <= n ; k++)
+//	int n;
+	//cin >> n;
+	double *x = new double[5];
+	double *y = new double[5];
+	for (int k = 0; k <= 4; k++)
 	{
-		x[k] = PI*k / (4 * n);
+		x[k] = PI*k / (4 * 4);
 		y[k] = sin(x[k]);
 	}
-	/*double _x;
-	cin >> _x;
-	cout << lagrange(_x, x, y, n)<<endl;
-	cout << sin(PI);*/
-	cout << newton(PI, x, y, n);
-	system("pause");
+	ofstream file("result.txt");
 	
+		for (double i = 0; i <= 4; i += 0.25)
+		{
+			file << PI*i / 16 << '\t' << lagrange(PI*i / 16, x, y, 4) << endl;
+		}
+
+	
+	file.close();
+	system("pause");
 }
