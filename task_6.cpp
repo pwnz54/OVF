@@ -1,3 +1,4 @@
+/* TODO зависимость погрешности от степени полинома */
 #include<iostream>
 #include<cmath>
 #include <fstream>
