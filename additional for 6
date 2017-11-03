@@ -1,0 +1,98 @@
+/* TODO зависимость погрешности от степени полинома */
+#include<iostream>
+#include<cmath>
+#include <fstream>
+#define PI 3.141592653589793238462643
+using namespace std;
+double lagrange(double _x, double* x, double* y, int n)
+{
+	double res = 0;
+
+
+	for (int i(0); i < n; i++)
+	{
+		double a = 1;
+		double b = 1;
+		for (int j(0); j < n; j++)
+		{
+			if (i != j)
+			{
+				a *= _x - x[j];
+				b *= -x[j] + x[i];
+			}
+		}
+
+		res += y[i] * a / b;
+	}
+	return res;
+}
+double rr(double* x, double* y, int n)
+{
+	double res = 0;
+	for (int i = 1; i <= n; i++)
+	{
+		double p = 1;
+		for (int j = 1; j <= n; j++)
+		{
+			if (i != j)
+			{
+				p *= (x[i] - x[j]);
+			}
+		}
+		res += (y[i] / p);
+
+	}
+	return res;
+
+}
+double newton(double _x, double* x, double* y, int n)
+{
+	double res = 0;
+	for (int i = 1; i <= n; i++)
+	{
+		double p = 1;
+		for (int j = 0; j <= i - 1; j++)
+		{
+			p *= (_x - x[j]);
+		}
+		res += rr(x, y, i)*p;
+	}
+	return res;
+}
+double net(double a, double b, int n){
+	return (b - a) / n;
+}
+int main()
+{
+	//int n;
+	//cin >> n;
+	double *x = new double[8];
+	double *y = new double[8];
+	double h = net(-1,1,8);
+	//ofstream file1("result1.txt");
+	x[0] = -1;
+	y[0] = -1. / (26);
+	int j = 1;
+	double a = -1;
+	//file1 << x[0] << '\t' << y[0] << endl;
+	while (a != 1)
+	{
+		a = a + h;
+		x[j] = a;
+		y[j] = 1. / (1 + 25 * x[j] * x[j]);
+		//file1 << x[j] << '\t' << y[j] << endl;
+	}
+	//file1.close();
+	/*for (int k = 0; k <= n; k++)
+	{
+		x[k] = -1 + net(-1,1,k);
+		y[k] = -1/(1+25*x[k]*x[k]);
+		file1 << x[k] << '\t' << y[k] << endl;
+	}
+	file1.close(); */
+
+	ofstream file("result.txt");
+	file << 8 << '\t' << lagrange(0.01, x, y, 8) - 1/(1+25*0.01*0.01) << endl;
+	file.close();
+	system("pause");
+}
