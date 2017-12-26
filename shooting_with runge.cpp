@@ -72,18 +72,8 @@ double runge (double a, double b, double t_init, double y_init, double z_init, d
 
 
 int main()
-{
-    int N = 100;
-    double* resY = new double[N];
-    double* resZ = new double[N];
-   // double z_init = -0.5; // shooting parameter
-  //  cout<<euler(-1,1,-1,0,z_init,N,func1,func2,resY,resZ);
-    /*for (int i=0; i<N;i++)
-    {
-        cout << resY[i] << "\t" << resZ[i]<<endl;
-    }
-*/
-    double a = -1;
+{ 
+    double a = -1; // диапазон поиска угла стрельбы
     double b = 1;
     double c = 0;
     while (abs(a-b) > 1e-10)
