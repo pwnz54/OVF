@@ -1,83 +1,181 @@
-#include<iostream>
-#include<fstream>
+#include <iostream>
+#include <cmath>
+#include <fstream>
 
+#define ALPH 0.75
 using namespace std;
 
-double f1(double y, double x)
+double func1(double z)
 {
-	return exp(y) - 1 + x*x*x*x;
+    return z;
 }
-double f2(double y, double x)
+double func2(double x, double y)
 {
-	return y;
+    return sin(x);
+}
+double F(double x)
+{
+    return -sin(x);
 }
 
-void runge(double x, double y, double t, double tfinal, double step, double(*f1)(double, double), double(*f2)(double, double))
+double euler(double a, double b, double t_init, double y_init, double z_init, double N, double(*func1)(double),double(*func2)(double,double))
 {
+    double  h = (b-a)/(N-1.0);
 
-	int n = 1;
-	double x_next = 0;
-	double y_next = 0;
-	// h = tfinal/n;
-	ofstream data("runge.txt");
+   double t_start = t_init;
+   double y_start = y_init;
+   double z_start = z_init;
+   double t_cur = t_start;
+   double y_cur = y_start;
+   double z_cur = z_start;
+   double y_next = 0;
+   double z_next = 0;
+   int n = 0;
+   ofstream data("euler.txt");
 
-	double t_cur = t + step;
-	while (t_cur <= tfinal)
-	{
-		x_next = x + step * (0.25 * f1(y, x) + 0.75 * f1(y + ((2. / 3.) * step * f1(y, x)), x + ((2. / 3.) * step * f1(y, x))));
-		y_next = y + step * (0.25 * f2(y, x) + 0.75 * f2(y + ((2. / 3.) * step * f2(y, x)), x + ((2. / 3.) * step * f2(y, x))));
+    while(t_cur <= b)
+    {
+        y_next = y_cur + h*func1(z_cur);
+        z_next = z_cur + h*func2(t_cur, y_cur);
+        y_cur = y_next;
+        z_cur = z_next;
 
-		x = x_next;
-		y = y_next;
-
-		data << t_cur << '\t' << x << '\t' << y << endl;
-
-		t_cur = t + step*n;
-		//t_cur = t + h;
-		n++;
-	}
-	data.close();
+        data << t_cur << '\t' << y_cur<<'\t'<<F(t_cur) << endl;
+        t_cur += h;
+        n++;
+    }
+    return y_cur;
 }
-void euler(double x, double y, double t, double tfinal, double step, double(*f1)(double, double), double(*f2)(double, double))
-{
-	int n = 1;
-	double x_next = 0;
-	double y_next = 0;
-	// h = tfinal/n;
-	ofstream data("euler.txt");
 
-	double t_cur = t + step;
-	while (t_cur <= tfinal)
-	{
-		x_next = x + step*f1(y, x);
-		y_next = y + step*f2(y, x);
-		x = x_next;
-		y = y_next;
-		data << t_cur << '\t' << x << '\t' << y << endl;
-		t_cur = t + n*step;
-		n++;
-	}
-	data.close();
+double eulerP(double a, double b, double t_init, double y_init, double z_init, double N, double(*func1)(double),double(*func2)(double,double))
+{
+    double  h = (b-a)/(N-1.0);
+
+   double t_start = t_init;
+   double y_start = y_init;
+   double z_start = z_init;
+   double t_cur = t_start;
+   double y_cur = y_start;
+   double z_cur = z_start;
+   double y_next = 0;
+   double z_next = 0;
+   int n = 1;
+   double dif = 0;
+   double maxdif = 0;
+
+
+    while(t_cur <= b)
+    {
+
+        y_next = y_cur + h*func1(z_cur);
+        z_next = z_cur + h*func2(t_cur, y_cur);
+        dif = fabs(y_cur - F(t_cur));
+        if (dif > maxdif)
+            maxdif = dif;
+
+        y_cur = y_next;
+        z_cur = z_next;
+
+
+        t_cur += h;
+        n++;
+    }
+    cout <<"Error = "<< maxdif << endl;
+    return maxdif;
+}
+
+double runge(double a, double b, double t_init, double y_init, double z_init, double N, double(*func1)(double),double(*func2)(double,double))
+{
+    double  h = (b-a)/(N-1.0);
+
+    double t_start = t_init;
+    double y_start = y_init;
+    double z_start = z_init;
+    double t_cur = t_start;
+    double y_cur = y_start;
+    double z_cur = z_start;
+    double y_next = 0;
+    double z_next = 0;
+    int n = 1;
+
+    ofstream data("runge.txt");
+    while (t_cur <= b)
+    {
+        y_next = y_cur + h*((1 - ALPH)*func1(z_cur) + ALPH*func1(z_cur + h / (2 * ALPH)));
+        z_next = z_cur + h*((1 - ALPH)*func2(t_cur,y_cur) + ALPH*func2(t_cur + h / (2 * ALPH)*func2(t_cur, y_cur),y_cur+h/(2*ALPH)));
+
+        y_cur = y_next;
+        z_cur = z_next;
+        data << t_cur << '\t' << y_cur << endl;
+        t_cur += h;
+    }
+    return y_cur;
+}
+
+double rungeP(double a, double b, double t_init, double y_init, double z_init, double N, double(*func1)(double),double(*func2)(double,double))
+{
+    double  h = (b-a)/(N-1.0);
+
+    double t_start = t_init;
+    double y_start = y_init;
+    double z_start = z_init;
+    double t_cur = t_start;
+    double y_cur = y_start;
+    double z_cur = z_start;
+    double y_next = 0;
+    double z_next = 0;
+    int n = 1;
+    double dif = 0;
+    double maxdif = 0;
+
+    while (t_cur <= b)
+    {
+        y_next = y_cur + h*((1 - ALPH)*func1(z_cur) + ALPH*func1(z_cur + h / (2 * ALPH)));
+        z_next = z_cur + h*((1 - ALPH)*func2(t_cur,y_cur) + ALPH*func2(t_cur + h / (2 * ALPH)*func2(t_cur, y_cur),y_cur+h/(2*ALPH)));
+        dif = fabs(y_cur - F(t_cur));
+        if (dif > maxdif)
+            maxdif = dif;
+        y_cur = y_next;
+        z_cur = z_next;
+
+        t_cur += h;
+    }
+    cout <<"Error = "<< maxdif << endl;
+    return maxdif;
 }
 
 int main()
 {
+    int N = 1000;
 
-	double xinit = 0;
-	double yinit = 0;
-	double tinit = 0;
-	double tfinal = 0;
-	cout << "t0: " << endl;
-	cin >> tinit;
-	cout << "x(t0)" << endl;
-	cin >> xinit;
-	cout << "y(t0)" << endl;
-	cin >> yinit;
-	cout << "t_final" << endl;
-	cin >> tfinal;
-	runge(xinit, yinit, tinit, tfinal, 0.01, f1, f2);
-	euler(xinit, yinit, tinit, tfinal, 0.001, f1, f2);
-
-	return 0;
+   // double z_init = -0.5; // shooting parameter
+  //  cout<<euler(-1,1,-1,0,z_init,N,func1,func2,resY,resZ);
+    /*for (int i=0; i<N;i++)
+    {
+        cout << resY[i] << "\t" << resZ[i]<<endl;
+    }
+*/
+    double a = -1000;
+    double b = 1000;
+    double c = 0;
+    while (abs(a-b) > 1e-15)
+    {
+        c = (a+b)/2.;
+        if((runge(0,M_PI,0,0,a,N,func1,func2)-0)*(runge(0,M_PI,0,0,c,N,func1,func2)-0) <= 0)
+        {
+            b = c;
+        }
+        if((runge(0,M_PI,0,0,b,N,func1,func2)-0)*(runge(0,M_PI,0,0,c,N,func1,func2)-0) <= 0)
+        {
+            a = c;
+        }
+    }
+    double al = (a+b)/2;
+    cout <<"Shooting parameter = "<< al<<endl;
+    cout << '\n' << "Accuracy"<<endl;
+    for (int i = 1e1; i < 1e7; i*=10)
+    {
+        cout << rungeP(0,M_PI,0,0,al,i,func1,func2) / rungeP(0,M_PI,0,0,al,i*10,func1,func2)  << endl;
+    }
 
 }
